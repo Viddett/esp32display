@@ -7,18 +7,13 @@
 #include <TouchManager.hpp> // Touch
 #include <string.h>
 #include <defines.h>
-#include <WiFi.h>
-#include <NTPClient.h>
-#include <WiFiUdp.h>
+#include <WiFiManager.hpp> // WiFi
 
 TFT_eSPI tft = TFT_eSPI();
 TouchManager _touchManager;
 lv_indev_drv_t _lvInDevDrv;
 
-const char* WIFI_SSID = "";
-const char* WIFI_PW = "";
-WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP);
+WiFiManager _wifiManager;
 
 static lv_disp_draw_buf_t draw_buf;
 static lv_color_t *disp_draw_buf;
@@ -81,19 +76,7 @@ void setup()
    Serial.println("ESP32 started");
 
    // Connect wifi
-   WiFi.begin(WIFI_SSID, WIFI_PW);
-   Serial.print("WiFi: connecting to ");
-   Serial.print(WIFI_SSID);
-   while(WiFi.status() != WL_CONNECTED) {
-      delay(500);
-      Serial.print(".");
-   }
-   Serial.print(" Connection successful, ip: ");
-   Serial.println(WiFi.localIP());
-
-   // Initialize NTP client
-   timeClient.begin();
-   timeClient.setTimeOffset(2 * 3600); // GMT+2
+   _wifiManager.setup();
 
    // Init TFT_eSPI driver
    tft.begin();
@@ -162,6 +145,7 @@ void setup()
 
 void loop()
 {
+   _wifiManager.poll();
   static int timeLast = millis();
   static int sec, min, hr = 0;
   int time = millis();
@@ -169,9 +153,8 @@ void loop()
    if (time >= timeLast + 1000) {
       timeLast = time;
       sec++;
-      timeClient.forceUpdate();
       Serial.print("Time: ");
-      Serial.println(timeClient.getFormattedTime());
+      Serial.println(_wifiManager.getCurrentTime());
       if (sec == 60) {
          sec = 0;
          min++;
