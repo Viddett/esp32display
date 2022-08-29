@@ -9,6 +9,7 @@
 #include <defines.h>
 #include <WiFiManager.hpp> // WiFi
 #include <Log.hpp>
+#include <Timer.hpp>
 
 TFT_eSPI tft = TFT_eSPI();
 TouchManager _touchManager;
@@ -142,16 +143,10 @@ void setup()
    }
 }
 
-String _currentTime;
 void loop()
 {
    _wifiManager.poll();
-   String newTime = _wifiManager.getCurrentTime();
-   if (!_currentTime.equals(newTime)) {
-      _currentTime = newTime;
-      lv_label_set_text(label,_currentTime.c_str());
-   }
-
+   lv_label_set_text(label,_wifiManager.getCurrentTime().c_str());
 
    lv_timer_handler(); /* let the GUI do its work */
    delay(5);
