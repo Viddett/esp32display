@@ -26,17 +26,7 @@ void TouchManager::poll(lv_indev_drv_t *indevDrv, lv_indev_data_t *data)
         // delay(30);
 
 #ifdef DEBUG_TOUCH
-        Serial.print("Pressure = ");
-        Serial.print(p.z);
-        Serial.print(", x = ");
-        Serial.print(p.x);
-        Serial.print(", y = ");
-        Serial.print(p.y);
-        Serial.print(", xc = ");
-        Serial.print(x);
-        Serial.print(", yc = ");
-        Serial.print(y);
-        Serial.println();
+        Log() << "Pressure:" << p.z << "x =" << p.x << "y =" << p.y << "xc =" << x << "yc =" << y;
 #endif
     }
 }

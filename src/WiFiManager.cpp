@@ -1,4 +1,5 @@
 #include <WiFiManager.hpp>
+#include <Log.hpp>
 
 WiFiUDP _ntpUDP;
 NTPClient _timeClient(_ntpUDP);
@@ -7,15 +8,13 @@ void WiFiManager::setup()
 {
     // Connect to WiFi
     WiFi.begin(_ssid.c_str(), _pw.c_str());
-    Serial.print("WiFi: connecting to ");
-    Serial.print(_ssid);
+    Log() << "WiFi: connecting to " << _ssid;
     while (WiFi.status() != WL_CONNECTED)
     {
         delay(500);
-        Serial.print(".");
+        Log() << ".";
     }
-    Serial.print("Connection successful, IP: ");
-    Serial.println(WiFi.localIP());
+    Log() << "Connection successful, IP:" << WiFi.localIP();
 
     // Initialize NTP client
     _timeClient.begin();

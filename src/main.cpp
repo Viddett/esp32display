@@ -8,6 +8,7 @@
 #include <string.h>
 #include <defines.h>
 #include <WiFiManager.hpp> // WiFi
+#include <Log.hpp>
 
 TFT_eSPI tft = TFT_eSPI();
 TouchManager _touchManager;
@@ -41,26 +42,25 @@ static void button_event(lv_event_t * event) {
    switch (event->code)
    {
    case LV_EVENT_CLICKED:
-      Serial.println("Button Clicked");
+      Log() << "Button Clicked";
       break;
       case LV_EVENT_SHORT_CLICKED:
-      Serial.println("Button Clicked Short");
+      Log() << "Button Clicked Short";
       break;
       case LV_EVENT_PRESSING:
-      //Serial.println("Button Pressing");
+      //Log() << "Button Pressing";
       break;
       case LV_EVENT_PRESS_LOST:
-      Serial.println("Button Press Lost");
+      Log() << "Button Press Lost";
       break;
       case LV_EVENT_LONG_PRESSED:
-      Serial.println("Button Long Press");
+      Log() << "Button Long Press";
       break;
       case LV_EVENT_RELEASED:
-      Serial.println("Button Released");
+      Log() << "Button Released";
       break;
    default:
-      //Serial.print("Unknown button event: ");
-      //Serial.println(event->code);
+      //Log() << "Unknown button event: " << event->code;
       break;
    }
 }
@@ -73,7 +73,7 @@ void setup()
 {
    // Init serial
    Serial.begin(115200);
-   Serial.println("ESP32 started");
+   Log() << "ESP32 started";
 
    // Connect wifi
    _wifiManager.setup();
@@ -98,7 +98,7 @@ void setup()
 
    if (!disp_draw_buf)
    {
-      Serial.println("LVGL disp_draw_buf allocate failed!");
+      Log() << "LVGL disp_draw_buf allocate failed!";
    }
    else
    {
@@ -138,34 +138,21 @@ void setup()
       lv_obj_align(_buttonTest2, LV_ALIGN_BOTTOM_RIGHT, 20 - 40, 20 - 40);
       lv_obj_add_event_cb(_buttonTest2, button_event, LV_EVENT_ALL, NULL);
 
-      Serial.println("Setup done");
+      Log() << "Setup done";
    }
 }
 
-
+String _currentTime;
 void loop()
 {
    _wifiManager.poll();
-  static int timeLast = millis();
-  static int sec, min, hr = 0;
-  int time = millis();
-  
-   if (time >= timeLast + 1000) {
-      timeLast = time;
-      sec++;
-      Serial.print("Time: ");
-      Serial.println(_wifiManager.getCurrentTime());
-      if (sec == 60) {
-         sec = 0;
-         min++;
-      }
-      if (min == 60) {
-         min = 0;
-         hr++;
-      }
-      String str = "Uptime: " + String( hr ) + ":" + String( min ) + ":" + String( sec );
-      lv_label_set_text(label, str.c_str());
+   String newTime = _wifiManager.getCurrentTime();
+   if (!_currentTime.equals(newTime)) {
+      _currentTime = newTime;
+      lv_label_set_text(label,_currentTime.c_str());
    }
+
+
    lv_timer_handler(); /* let the GUI do its work */
    delay(5);
 }
