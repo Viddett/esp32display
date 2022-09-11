@@ -10,10 +10,13 @@
 #include <WiFiManager.hpp> // WiFi
 #include <Log.hpp>
 #include <Timer.hpp>
+#include <DHT.h>
 
 TFT_eSPI tft = TFT_eSPI();
 TouchManager _touchManager;
 lv_indev_drv_t _lvInDevDrv;
+
+DHT dht(22, DHT11);
 
 WiFiManager _wifiManager;
 
@@ -145,9 +148,15 @@ void setup()
 
 void loop()
 {
-   _wifiManager.poll();
-   lv_label_set_text(label,_wifiManager.getCurrentTime().c_str());
-
+   static Timer dhtTimer;
+   dhtTimer.run();
+   if (dhtTimer.isElapsed(1)) {
+      dhtTimer.start();
+      _wifiManager.poll();
+      Log() << dht.readTemperature() << "C" << dht.readHumidity() << "%";
+      lv_label_set_text(label,_wifiManager.getCurrentTime().c_str());
+   }
+   
    lv_timer_handler(); /* let the GUI do its work */
    delay(5);
 }

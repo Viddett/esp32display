@@ -15,7 +15,6 @@ class Timer {
 
     private:
     bool _isRunning {false};
-
     int _startTime {-1};
 };
 

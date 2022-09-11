@@ -1,4 +1,5 @@
 #include <TouchManager.hpp>
+//#define DEBUG_TOUCH
 
 void TouchManager::setup(uint8_t rotation)
 {
